@@ -2,6 +2,7 @@
 
 package com.example.Biluthyrningssystem.services;
 
+import com.example.Biluthyrningssystem.dto.RentalDurationDTO;
 import com.example.Biluthyrningssystem.entities.Car;
 import com.example.Biluthyrningssystem.entities.Orders;
 import com.example.Biluthyrningssystem.exceptions.DataNotFoundException;
@@ -167,7 +168,7 @@ public class StatisticsServiceImpl implements StatisticsService {
     }
 
     @Override
-    public Map<Integer, Long> getRentalDurationsByDays() {
+    public List<RentalDurationDTO> getRentalDurationsByDays() {
 
         List<Orders> allOrders = orderService.getAllOrders();
 
@@ -191,7 +192,10 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         logger.info("Endpoint /rentaldurations was used and returned {} durations.", result.size());
 
-        return result;
+            return result.entrySet().stream()
+                    .map(entry -> new RentalDurationDTO(entry.getKey(), entry.getValue()))
+                    .sorted(Comparator.comparingInt(RentalDurationDTO::getDays))
+                    .collect(Collectors.toList());
     }
 
 
@@ -290,6 +294,7 @@ public class StatisticsServiceImpl implements StatisticsService {
             logger.warn("/revenue Could not parse date {} - {} because wrong format was used.", startDate, endDate);
             throw new IncorrectInputException("Statistics", "date input", startDate + " and " + endDate, "yyyy-MM-dd", "");
         }
+
         if (start.isAfter(end)) {
             logger.warn("/revenue Invalid date because start date {} is after end date {}", startDate, endDate);
             throw new IncorrectInputException("Statistics", "Start-End Dates", ("Start:" + startDate + "->End:" + endDate), "YYYY-MM-DD", "Start date must be BEFORE end date.");
@@ -430,5 +435,7 @@ public class StatisticsServiceImpl implements StatisticsService {
         logger.info("Endpoint admin/statistics/orders was used with startDate {} endDate {} and returned order count {}.", startDate, endDate, activeOrders.size());
         return result;
     }
+
+
 
 }
