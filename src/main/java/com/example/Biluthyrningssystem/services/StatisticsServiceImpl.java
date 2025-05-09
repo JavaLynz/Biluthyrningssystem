@@ -290,7 +290,6 @@ public class StatisticsServiceImpl implements StatisticsService {
             logger.warn("/revenue Could not parse date {} - {} because wrong format was used.", startDate, endDate);
             throw new IncorrectInputException("Statistics", "date input", startDate + " and " + endDate, "yyyy-MM-dd", "");
         }
-
         if (start.isAfter(end)) {
             logger.warn("/revenue Invalid date because start date {} is after end date {}", startDate, endDate);
             throw new IncorrectInputException("Statistics", "Start-End Dates", ("Start:" + startDate + "->End:" + endDate), "YYYY-MM-DD", "Start date must be BEFORE end date.");
