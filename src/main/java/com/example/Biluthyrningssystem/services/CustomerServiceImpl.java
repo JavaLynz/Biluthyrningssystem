@@ -52,7 +52,7 @@ public class CustomerServiceImpl implements CustomerService { //Lynsey Fox
         if (schrodingersCustomer.isPresent()) {
             Customer customerToShow = schrodingersCustomer.get();
 
-            logger.info("Customer with Personnummer: {} details accessed", customerToShow.getPersonnummer());
+            logger.info("Customer with Personnummer: {} details accessed", customerToShow.getCustomerId());
 
             return schrodingersCustomer.get();
         }
@@ -64,7 +64,7 @@ public class CustomerServiceImpl implements CustomerService { //Lynsey Fox
     @Override
     public CustomerRegistrationDTO addCustomer(Customer newCustomer) {
 
-        String personnummerToAdd = newCustomer.getPersonnummer();
+        String personnummerToAdd = newCustomer.getCustomerId();
 
         if (customerRepository.existsByPersonnummer(personnummerToAdd)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Customer already exists with given personnummer");
@@ -74,7 +74,7 @@ public class CustomerServiceImpl implements CustomerService { //Lynsey Fox
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User already exists with given personnummer");
         }
 
-        if(!isValidPersonnummer(newCustomer.getPersonnummer())){
+        if(!isValidPersonnummer(newCustomer.getCustomerId())){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid personnummer: format should be xxxxxxxx-xxxx");
         }
 
@@ -87,7 +87,7 @@ public class CustomerServiceImpl implements CustomerService { //Lynsey Fox
         newCustomer.setAddress(existingAddress);
 
         Customer savedCustomer = customerRepository.save(newCustomer);
-        String username = savedCustomer.getPersonnummer();
+        String username = savedCustomer.getCustomerId();
         String password = username.substring(username.length() - 4);
 
 
@@ -99,7 +99,7 @@ public class CustomerServiceImpl implements CustomerService { //Lynsey Fox
         userDetailsManager.createUser(user);
         logger.info("Created user login for personnummer: {}", personnummerToAdd);
 
-        logger.info("New customer added to database with Personnummer: {}", savedCustomer.getPersonnummer());
+        logger.info("New customer added to database with Personnummer: {}", savedCustomer.getCustomerId());
 
         String loginInfo = "Login username: " + username + ", password: " + password;
 
@@ -131,7 +131,7 @@ public class CustomerServiceImpl implements CustomerService { //Lynsey Fox
     private void validateDetails(Customer customerToCheck){
         validateStringField(customerToCheck.getFirstName(), "first name");
         validateStringField(customerToCheck.getLastName(), "last name");
-        validateStringField(customerToCheck.getPersonnummer(), "personnummer");
+        validateStringField(customerToCheck.getCustomerId(), "personnummer");
         validateStringField(customerToCheck.getEmail(), "email address");
         validateStringField(customerToCheck.getPhone(), "phone number");
 
@@ -161,11 +161,11 @@ public class CustomerServiceImpl implements CustomerService { //Lynsey Fox
     }
     @Override
     public Customer updateCustomer(Customer customerToUpdate) {
-        Customer existing = getCustomerByPersonnummer(customerToUpdate.getPersonnummer());
+        Customer existing = getCustomerByPersonnummer(customerToUpdate.getCustomerId());
 
         authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (!existing.getPersonnummer().equals(authentication.getName())) {
+        if (!existing.getCustomerId().equals(authentication.getName())) {
             logger.error("Attempted to update another user's details");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A user can only update their own details");
         }
@@ -182,7 +182,7 @@ public class CustomerServiceImpl implements CustomerService { //Lynsey Fox
 
         existing.setAddress(existingAddress);
 
-        logger.info("Customer details updated in database for customer with Personnummer: {}", customerToUpdate.getPersonnummer());
+        logger.info("Customer details updated in database for customer with Personnummer: {}", customerToUpdate.getCustomerId());
 
         return customerRepository.save(existing);
     }
@@ -195,7 +195,7 @@ public class CustomerServiceImpl implements CustomerService { //Lynsey Fox
             customerRepository.delete(schrodingersCustomer.get());
             Customer customerToDelete = schrodingersCustomer.get();
 
-            logger.info("Customer with personnummer: {} removed from database.", customerToDelete.getPersonnummer());
+            logger.info("Customer with personnummer: {} removed from database.", customerToDelete.getCustomerId());
 
         } else {
             logger.error("Customer not found with personnummer: {}", personnummer);

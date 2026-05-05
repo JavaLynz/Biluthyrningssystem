@@ -47,7 +47,7 @@ class CustomerServiceImplTest { //Lynsey Fox
 
         assertThat(result).isNotNull();
         assertThat(result.getCustomer()).isEqualTo(customer);
-        String expectedLoginDetails = "Login username: " + customer.getPersonnummer() + ", password: " + customer.getPersonnummer().substring(customer.getPersonnummer().length() - 4);
+        String expectedLoginDetails = "Login username: " + customer.getCustomerId() + ", password: " + customer.getCustomerId().substring(customer.getCustomerId().length() - 4);
         assertThat(result.getLoginDetails()).isEqualTo(expectedLoginDetails);
         verify(customerRepository).save(customer);
         verify(addressRepository).findById(1L);

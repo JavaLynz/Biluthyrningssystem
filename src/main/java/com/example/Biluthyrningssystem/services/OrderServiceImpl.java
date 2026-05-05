@@ -26,9 +26,9 @@ public class OrderServiceImpl implements OrderService {
 
     private final Logger LOGGER = LoggerFactory.getLogger(OrderServiceImpl.class);
 
-    private CustomerRepository customerRepository;
-    private OrderRepository orderRepository;
-    private CarRepository carRepository;
+    private final CustomerRepository customerRepository;
+    private final OrderRepository orderRepository;
+    private final CarRepository carRepository;
 
     @Autowired
     public OrderServiceImpl(OrderRepository orderRepository, CustomerRepository customerRepository, CarRepository carRepository){
@@ -43,19 +43,19 @@ public class OrderServiceImpl implements OrderService {
         Optional<Customer> loggedInUser = customerRepository.findById(username);
 
         if (order.getCustomer() == null  && loggedInUser.isPresent()){
-            LOGGER.info("Customer with ID: {} added to order.", loggedInUser.get().getPersonnummer());
+            LOGGER.info("Customer with ID: {} added to order.", loggedInUser.get().getCustomerId());
             order.setCustomer(loggedInUser.get());
         } else {
-            Optional<Customer> customerCheck = customerRepository.findById(order.getCustomer().getPersonnummer());
+            Optional<Customer> customerCheck = customerRepository.findById(order.getCustomer().getCustomerId());
             if (customerCheck.isPresent()){
-                if (!customerCheck.get().getPersonnummer().equals(username) && customerCheck.get().getPersonnummer() != null){
-                    LOGGER.error("Unauthorized request by user: {}. Attempted to create order for customer with ID: {}", username, order.getCustomer().getPersonnummer());
-                    throw new UnauthorisedRequestException("User", username, "create new order for user: "+order.getCustomer().getPersonnummer(), "Users can only create orders for themselves");
+                if (!customerCheck.get().getCustomerId().equals(username) && customerCheck.get().getCustomerId() != null){
+                    LOGGER.error("Unauthorized request by user: {}. Attempted to create order for customer with ID: {}", username, order.getCustomer().getCustomerId());
+                    throw new UnauthorisedRequestException("User", username, "create new order for user: "+order.getCustomer().getCustomerId(), "Users can only create orders for themselves");
                 }
                 order.setCustomer(loggedInUser.get());
             } else {
-                LOGGER.error("Customer with ID : {} not found. Request made by user: {}", order.getCustomer().getPersonnummer(), username);
-                throw new ResourceNotFoundException("Customer", "ID", order.getCustomer().getPersonnummer());
+                LOGGER.error("Customer with ID : {} not found. Request made by user: {}", order.getCustomer().getCustomerId(), username);
+                throw new ResourceNotFoundException("Customer", "ID", order.getCustomer().getCustomerId());
             }
         }
         checkOrderInformation(order, username);
@@ -69,8 +69,8 @@ public class OrderServiceImpl implements OrderService {
         Optional<Orders> orderCheck = orderRepository.getOrdersById(order.getId());
         if (orderCheck.isPresent()){
             order = orderCheck.get();
-            if (!order.getCustomer().getPersonnummer().equals(username)){
-                LOGGER.error("Unauthorized request by user: {}. Attempted to cancel order {} registered to customer with ID: {}", username,order.getId(),order.getCustomer().getPersonnummer());
+            if (!order.getCustomer().getCustomerId().equals(username)){
+                LOGGER.error("Unauthorized request by user: {}. Attempted to cancel order {} registered to customer with ID: {}", username,order.getId(),order.getCustomer().getCustomerId());
                 throw new UnauthorisedRequestException("User", username, "cancel an order", "Users can only edit their own orders");
             }
             order.setOrderCancelled(true);
@@ -87,7 +87,7 @@ public class OrderServiceImpl implements OrderService {
         LOGGER.info("Locating all orders registered to user: {} in database. Request made by user: {}", username, username);
         List<Orders> customerOrders = new ArrayList<>();
         for (Orders order: orderRepository.findAll()){
-            if (order.getCustomer().getPersonnummer().equals(username)){
+            if (order.getCustomer().getCustomerId().equals(username)){
                 customerOrders.add(order);
             }
         }
@@ -100,7 +100,7 @@ public class OrderServiceImpl implements OrderService {
         LOGGER.info("Locating all active orders registered to user: {} in database. Request made by user: {}", username, username);
         List<Orders> activeCustomerOrders = new ArrayList<>();
         for (Orders order: orderRepository.findAll()){
-            if (!order.isOrderCancelled() && order.getCustomer().getPersonnummer().equals(username)){
+            if (!order.isOrderCancelled() && order.getCustomer().getCustomerId().equals(username)){
                 activeCustomerOrders.add(order);
             }
         }
@@ -183,7 +183,7 @@ public class OrderServiceImpl implements OrderService {
             throw new IncorrectInputException("Order", "Hire Start-End Dates", ("Start:"+order.getHireStartDate()+"->End:"+order.getHireEndDate()),"YYY-MM-DD","Start date must be BEFORE end date.");
         }
         double priceCalc = ((order.getHireEndDate().compareTo(order.getHireStartDate()))*order.getCar().getPricePerDay())+order.getCar().getPricePerDay();
-        if (order.getTotalPrice() == null || order.getTotalPrice().equals(Double.valueOf(0))){
+        if (order.getTotalPrice() == null || order.getTotalPrice().equals((double) 0)){
             LOGGER.info("Total price calculated to {}. Price added to order.", priceCalc);
             order.setTotalPrice(priceCalc);
         }
