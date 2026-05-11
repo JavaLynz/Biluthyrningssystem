@@ -30,7 +30,7 @@ class CustomerRepositoryTest { //Lynsey Fox
     @Test
     void existsByPersonnummerShouldReturnTrueTest() {
 
-       boolean customerExists = customerRepository.existsByPersonnummer(customer.getPersonnummer());
+       boolean customerExists = customerRepository.existsByPersonnummer(customer.getCustomerId());
 
        assertThat(customerExists).isTrue();
     }

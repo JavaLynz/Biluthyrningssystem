@@ -10,7 +10,7 @@ import java.util.List;
 public class Customer {
     @Id
     @Column(length = 50, nullable = false)
-    private String personnummer;
+    private String customerId;
 
     @Column(length = 50, nullable = false)
     private String firstName;
@@ -36,8 +36,8 @@ public class Customer {
 
     public Customer() {}
 
-    public Customer(String personnummer, String firstName, String lastName, Address address, String email, String phone) {
-        this.personnummer = personnummer;
+    public Customer(String customerId, String firstName, String lastName, Address address, String email, String phone) {
+        this.customerId = customerId;
         this.firstName = firstName;
         this.lastName = lastName;
         this.address = address;
@@ -45,12 +45,12 @@ public class Customer {
         this.phone = phone;
     }
 
-    public String getPersonnummer() {
-        return personnummer;
+    public String getCustomerId() {
+        return customerId;
     }
 
-    public void setPersonnummer(String personnummer) {
-        this.personnummer = personnummer;
+    public void setCustomerId(String personnummer) {
+        this.customerId = personnummer;
     }
 
     public String getFirstName() {
@@ -104,7 +104,7 @@ public class Customer {
     @Override
     public String toString() {
         return "Customer{" +
-                "personnummer='" + personnummer + '\'' +
+                "personnummer='" + customerId + '\'' +
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", address=" + address +

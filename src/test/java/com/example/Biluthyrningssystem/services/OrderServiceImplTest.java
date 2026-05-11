@@ -34,10 +34,10 @@ import static org.junit.jupiter.api.Assertions.*;
 @Rollback
 class OrderServiceImplTest {
 
-    private OrderServiceImpl orderService;
-    private OrderRepository orderRepository;
-    private CarRepository carRepository;
-    private CustomerRepository customerRepository;
+    private final OrderServiceImpl orderService;
+    private final OrderRepository orderRepository;
+    private final CarRepository carRepository;
+    private final CustomerRepository customerRepository;
 
     private static Orders order;
     private String username;
@@ -86,7 +86,7 @@ class OrderServiceImplTest {
     void addOrderWithCustomerContainingOnlyIDShouldReturnMatchingOrdersObject() {
         //When
         Customer emptyCustomer = new Customer();
-        emptyCustomer.setPersonnummer(username);
+        emptyCustomer.setCustomerId(username);
         order.setCustomer(emptyCustomer);
         Orders addedOrder = orderService.addOrder(order,username);
         //Then
@@ -111,7 +111,7 @@ class OrderServiceImplTest {
     void addOrderWithNonExistentCustomerShouldThrowResourceNotFoundException() {
         //Given
         Customer nonCustomer = new Customer();
-        nonCustomer.setPersonnummer("10");
+        nonCustomer.setCustomerId("10");
         order.setCustomer(nonCustomer);
         //When
         ResourceNotFoundException response = assertThrows(ResourceNotFoundException.class, ()-> orderService.addOrder(order,username));
@@ -341,7 +341,7 @@ class OrderServiceImplTest {
     @Test
     void addOrderWithTotalPrice0ShouldReturnMatchingOrdersObject() {
         //When
-        order.setTotalPrice(Double.valueOf(0));
+        order.setTotalPrice((double) 0);
         Orders addedOrder = orderService.addOrder(order,username);
         //Then
         Optional<Orders> completedOrder = orderRepository.getOrdersById(addedOrder.getId());

@@ -364,7 +364,7 @@ public class StatisticsServiceImpl implements StatisticsService {
 
         for(Orders order : allOrders) {
             if(order.getCustomer() != null && !order.isOrderCancelled()) {
-                String customerId = order.getCustomer().getPersonnummer();
+                String customerId = order.getCustomer().getCustomerId();
                 double revenue = order.getTotalPrice();
 
                 customersRevenueMap.put(customerId, customersRevenueMap.getOrDefault(customerId,0.0) + revenue);
@@ -381,7 +381,7 @@ public class StatisticsServiceImpl implements StatisticsService {
                     Customer customer = customerRepository.findById(entry.getKey())
                             .orElseThrow(() -> new ResourceNotFoundException("Customer", "personnummer", entry.getKey()));
                     String name = customer.getFirstName() + " " + customer.getLastName();
-                    return new CustomerRevenueDTO(customer.getPersonnummer(), name, entry.getValue());
+                    return new CustomerRevenueDTO(customer.getCustomerId(), name, entry.getValue());
                 })
                 .sorted(Comparator.comparingDouble(CustomerRevenueDTO::getCustomerRevenue).reversed())
                 .collect(Collectors.toList());
