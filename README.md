@@ -125,3 +125,5 @@ during our Java Enterprise studies.
 | 19751230-9101 | 9101 |
 | 19881122-3456 | 3456 |
 | 19950505-7890 | 7890 |
+
+Demo credentials only — not representative of production security practices
